@@ -1,5 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy import stats
+import numpy as np
 
 volt1, volt2 = 92, 91
 
@@ -50,9 +52,26 @@ b = 0.3 - slope * times["30%"]
 T0 = -b / slope
 T_tone = times["30%"] - T0
 T1 = (1 - b) / slope  # Ανόδου
-T2 = x1[len(x1) - 1] - T0  # Ουράς (Θεωρούμε ότι η τελευταία μέτρηση ειναι 50% του μεγίστου)
-print(f"\tΧρόνος ανόδου (μέτωπο): {T1:.3E}s")
-print(f"\tΧρόνος ουράς: {T2:.3E}s")
+# T2 = x1[len(x1) - 1] - T0  # Ουράς (Θεωρούμε ότι η τελευταία μέτρηση ειναι 50% του μεγίστου)
+
+slope, intercept, r, p, std_err = stats.linregress(x2[len(x2) // 2:], y2[len(y2) // 2:])
+
+
+def linear(x):
+    return slope * x + intercept
+
+
+start = x2[len(x2) // 2]
+end = 1.3 * x2[len(x2) - 10]
+num = len(x2)
+new_linspace = np.linspace(start, end, num)
+T2 = 0
+for x in new_linspace:
+    if abs(linear(x) - max2 / 2) < err:
+        T2 = x - T_tone
+
+print(f"\tΧρόνος ανόδου (μέτωπο): {(10**6)*T1:.3f}μs")
+print(f"\tΧρόνος ουράς: {(10**6)*T2:.3f}μs")
 
 """ΥΠΟΛΟΓΙΣΜΟΣ ΧΡΟΝΩΝ ΣΕ ΠΕΙΡΑΜΑ ΜΕ ΔΙΑΣΠΑΣΗ (χρόνος διάσπασης)"""
 
@@ -63,11 +82,11 @@ for i in range(len(x1)):
     if abs(y1[i] - 0.5 * max1) < err:
         t50 = x1[i]
         break
-for i in range(len(x1)-1, 0, -1):
+for i in range(len(x1) - 1, 0, -1):
     if abs(y1[i] - 0.5 * max1) < err:
         t50_tone = x1[i]
         break
-print(f"\tΧρόνος διάσπασης: {t50_tone - t50:.3E}s")
+print(f"\tΧρόνος διάσπασης: {(t50_tone - t50)*10**6:.3f}μs")
 print(f"\tΕύρος: {max1 * 241 / 1000:.2f}kV")
 
 fig, axs = plt.subplots(2)
@@ -79,9 +98,10 @@ axs[0].set_title("Με διάσπαση")
 axs[0].set_ylabel("Τάση (kV)")
 axs[0].set_xlabel("Χρόνος (s)")
 axs[1].plot(x2, y2, linewidth=0.25)
+
+axs[1].plot(new_linspace, linear(new_linspace), "red")
 axs[1].set_title("Χωρίς διάσπαση")
 axs[1].set_ylabel("Τάση (kV)")
 axs[1].set_xlabel("Χρόνος (s)")
-
 # Display the plot
 plt.show()
