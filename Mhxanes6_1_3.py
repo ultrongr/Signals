@@ -26,30 +26,38 @@ for i in range(len(F)):
     n.append(Pmech[i] / Pen[i])
 
 
+
+
 mpl.rcParams['figure.dpi'] = 150
 plt.rcParams["figure.figsize"] = (8, 8)
 
-fig, (ax1, ax2) = plt.subplots(2, 1)
-ax1twin = ax1.twinx()
-ax1.plot(N, S, label='S')
-ax1.plot(N, Pen, label='Pen')
-ax1.plot(N, Pmech, label='Pmech')
+fig1, (ax1, ax2, ax3) = plt.subplots(3, 1)
+fig1.tight_layout(pad=4.0)
+fig2, ax4 = plt.subplots(1, 1)
+
+ax1.grid()
+ax2.grid()
+ax3.grid()
+ax4.grid()
+ax1.plot(N, S, 'r', label='S')
+ax1.plot(N, Pen, 'b', label='Pen')
+ax1.plot(N, Pmech, 'g', label='Pmech')
 ax1.set_xlabel('N(rpm)')
 ax1.set_ylabel('S(VA), Pen(W), Pmech(W)')
-
-ax1twin.set_ylabel('Is(A), M(Nm)', color = "black")
-ax1twin.plot(N, Is, label='Is', color = "black")
-ax1twin.plot(N, M, label='M', color = "red")
-ax1twin.tick_params(axis='y', labelcolor='black')
-
-
-
 ax1.legend()
-ax1twin.legend()
-ax2.plot(N, n, label='n')
-ax2.plot(N, cosphi, label='cosphi')
-ax2.plot(N, [n[i] * cosphi[i] for i in range(len(n))], label='n*cosphi')
+ax2.plot(N, M, 'r', label='M')
 ax2.set_xlabel('N(rpm)')
-ax2.set_ylabel('n, cosphi, n*cosphi')
+ax2.set_ylabel('M(Nm)')
 ax2.legend()
+ax3.plot(N, Is, 'r', label='Is')
+ax3.set_xlabel('N(rpm)')
+ax3.set_ylabel('Is(A)')
+ax3.legend()
+ax4.plot(N, n, 'r', label='n')
+ax4.plot(N, cosphi, 'b', label='cosphi')
+ax4.plot(N, [n[i] * cosphi[i] for i in range(len(n))], 'g', label='n*cosphi')
+ax4.set_xlabel('N(rpm)')
+ax4.set_ylabel('n, cosphi, n*cosphi')
+ax4.legend()
 plt.show()
+
